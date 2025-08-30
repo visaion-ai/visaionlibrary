@@ -1,3 +1,15 @@
+# custom
+tools/export_onnx.py
+.vscode/
+.visaion
+.backup/
+data/
+work_dirs/
+output/
+workspace/
+pretrained_weights/
+*.pth
+*.onnx
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
