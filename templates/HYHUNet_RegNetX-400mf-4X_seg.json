@@ -1,0 +1,399 @@
+{
+    "page": [
+        {
+            "label": "Common Config",
+            "label_cn": "通用参数",
+            "info": "Common Config",
+            "info_cn": "通用参数",
+            "id":"common",
+            "group_level":1,
+            "children": [
+                {
+                    "type":"groupShow",
+                    "groupChildren":[
+                        {
+                            "id":"gpuNum",
+                            "type": "select",
+                            "valueList":[{"label":1,"value":1},{"label":2,"value":2},{"label":4,"value":4},{"label":8,"value":8},{"label":16,"value":16}],
+                            "key": "VISAION_GPU_NUM",
+                            "show": true,
+                            "advanced": false,
+                            "label": "GPU Number",
+                            "label_cn": "GPU数量",
+                            "info": "GPU Number",
+                            "info_cn": "GPU数量",
+                            "value": 1,
+                            "precision": 0
+                        },
+                        {
+                            "id":"zonpici",
+                            "type": "select",
+                            "valueList":[
+                                {"label":1,"value":1},{"label":2,"value":2},{"label":4,"value":4},{"label":8,"value":8},
+                                {"label":16,"value":16},{"label":32,"value":32},{"label":64,"value":64},{"label":128,"value":128},
+                                {"label":256,"value":256},{"label":512,"value":512},{"label":1024,"value":1024}
+                            ],
+                            "key": "VISAION_BATCH_SIZE_ALL",
+                            "advanced": false,
+                            "label": "BatchSize(all)",
+                            "label_cn": "总批次大小",
+                            "info": "BatchSize(all)",
+                            "info_cn": "每次迭代在训练集中抽取batchsize个样本数参与训练",
+                            "value": 8,
+                            "precision": 0,
+                            "min": 2,
+                            "max": 1024
+                        },
+                        {
+                            "id":"dangpupici",
+                            "type": "inputNumber",
+                            "key": "VISAION_BATCH_SIZE",
+                            "readOnly":true,
+                            "advanced": false,
+                            "label": "BatchSize per GPU",
+                            "label_cn": "单GPU批次大小",
+                            "info": "BatchSize per GPU",
+                            "info_cn": "每次迭代在训练集中抽取batchsize个样本数参与训练, 总批次大小/GPU数量",
+                            "value": 8,
+                            "precision": 0,
+                            "min": 0.1,
+                            "max": 1000
+                        },
+                        {
+                            "id":"epochNum",
+                            "type": "inputNumber",
+                            "key": "VISAION_MAX_EPOCHS",
+                            "advanced": false,
+                            "label": "epoch",
+                            "label_cn": "迭代次数(epoch)",
+                            "info": "Total number of iter loop",
+                            "info_cn": "让模型在训练集上训练多少轮",
+                            "value": 100,
+                            "precision": 0,
+                            "min": 20,
+                            "max": 10000000000
+                        },
+                        {
+                            "id":"iterNum",
+                            "type": "inputNumber",
+                            "key": "VISAION_MAX_ITERS",
+                            "advanced": false,
+                            "label": "Total Iter",
+                            "label_cn": "迭代次数(iter)",
+                            "info": "Total number of iter loop",
+                            "info_cn": "一个iteration等于使用batchsize个样本训练一次, 此处填写训练过程中共迭代多少次, 计算公式: 迭代次数(iter) = 迭代次数(epoch) * 训练集大小 / 总批次大小",
+                            "value": 3000,
+                            "precision": 0,
+                            "min": 0,
+                            "max": 10000000000
+                        },
+                        {
+                            "id":"amp",
+                            "type": "switch",
+                            "key": "VISAION_AMP",
+                            "advanced": false,
+                            "label": "AMP",
+                            "label_cn": "混合精度训练",
+                            "info": "AMP",
+                            "info_cn": "是否使用混合精度训练",
+                            "value": false
+                        }
+                    ]
+                },
+                {
+                    "type":"groupShow",
+                    "groupChildren":[
+                        {
+                            "id":"negativeSampleRatio",
+                            "type": "inputNumber",
+                            "key": "VISAION_NEG_RATIO",
+                            "advanced": false,
+                            "label": "NegRatio",
+                            "label_cn": "负样本比例",
+                            "info": "Negative Ratio",
+                            "info_cn": "batchsize个训练样本中负样本占比, 即 负样本数量 / 单GPU批次大小",
+                            "value": 0.3,
+                            "precision": 2,
+                            "min": 0.1,
+                            "max": 1
+                        },
+                        {
+                            "id":"evalInterval",
+                            "type": "inputNumber",
+                            "key": "VISAION_VAL_INTERVAL",
+                            "advanced": false,
+                            "label": "Evaluate Times",
+                            "label_cn": "验证间隔",
+                            "info": "Evaluate Times",
+                            "info_cn": "迭代一定次数后验证并保存权重，验证间隔<迭代次数",
+                            "value": 1000,
+                            "precision": 0,
+                            "min": 1,
+                            "max": 100000
+                        }
+                    ]
+                },
+                {
+                    "type":"groupShow",
+                    "groupChildren":[
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_LR",
+                            "advanced": false,
+                            "label": "Learning Rate",
+                            "label_cn": "学习率",
+                            "info": "learning rate",
+                            "info_cn": "学习率是一个可配置的超参数, 其作用是控制每次根据误差对模型权重更新多少",
+                            "value": 0.001,
+                            "precision": 4,
+                            "min": 1e-05,
+                            "max": 0.01
+                        },
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_WEIGHT_DECAY",
+                            "advanced": true,
+                            "label": "Weight Decay",
+                            "label_cn": "权重衰减",
+                            "info": "Weight Decay",
+                            "info_cn": "为了防止学习率过大，在收敛到全局最优点的时候会来回摆荡，所以要让学习率随着训练轮数不断按指数级下降，收敛梯度下降的学习步长",
+                            "value": 0.0005,
+                            "precision": 4,
+                            "min": 1e-06,
+                            "max": 0.1
+                        }
+                    ]
+                }
+                
+            ]
+        },
+        {
+            "label": "Model Config",
+            "label_cn": "模型参数",
+            "info": "Model Config",
+            "info_cn": "模型参数",
+            "id":"model",
+            "group_level":1,
+            "children": [
+                {
+                    "type":"groupShow",
+                    "groupChildren":[
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_CROP_SIZE",
+                            "advanced": false,
+                            "label": "crop_size",
+                            "label_cn": "训练裁切图尺寸",
+                            "info": "crop size",
+                            "info_cn": "将训练集的样本裁剪为小图输入训练的尺寸",
+                            "value": 128,
+                            "precision": 0,
+                            "min": 32,
+                            "step": 32,
+                            "max": 1024
+                        },
+                        {
+                            "relate_key": ["VISAION_INFER_CROP_SIZE","VISAION_STRIDE"],
+                            "type": "switch",
+                            "key": "VISAION_SLIDE_INFER_MODE",
+                            "advanced": false,
+                            "label": "slide inference mode",
+                            "label_cn": "是否滑窗推理",
+                            "info": "slide inference mode",
+                            "info_cn": "是否将验证集的样本裁剪为小图进行推理验证，选择是会使用选定的推理小图大小和步长进行滑窗推理，选择否则整图一起进行一次推理",
+                            "value": true
+                        },
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_INFER_CROP_SIZE",
+                            "show": true,
+                            "advanced": false,
+                            "label": "infer_crop_mode",
+                            "label_cn": "推理裁切图尺寸",
+                            "info": "",
+                            "info_cn": "将验证集的样本裁剪为小图进行推理验证的尺寸，可以与训练阶段不同",
+                            "value": 128,
+                            "precision": 0,
+                            "min": 32,
+                            "step": 32,
+                            "max": 1024
+                        },
+                        {
+                            "show": true,
+                            "type": "inputNumber",
+                            "key": "VISAION_STRIDE",
+                            "advanced": false,
+                            "label": "stride",
+                            "label_cn": "推理裁切滑动步长",
+                            "info": "stride",
+                            "info_cn": "滑窗推理时的步长，需要小于小图大小",
+                            "value": 64,
+                            "precision": 0,
+                            "min": 1,
+                            "max": 1024
+                        }
+                    ]
+                },
+                {
+                    "type":"groupShow",
+                    "groupChildren":[
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_VAL_IOU_THRESHOLD",
+                            "advanced": true,
+                            "label": "IOU threshold",
+                            "label_cn": "IOU阈值",
+                            "info": "To filter low iou regions in evaluation",
+                            "info_cn": "验证时滤除IOU低于该阈值的检测结果",
+                            "value": 0.25,
+                            "precision": 2,
+                            "min": 0.01,
+                            "max": 1.00
+                        },
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_VAL_MIN_AREA",
+                            "advanced": true,
+                            "label": "min area",
+                            "label_cn": "最小面积",
+                            "info": "To filter small regions in evaluation",
+                            "info_cn": "验证时滤除面积低于该值的检测结果",
+                            "value": 60,
+                            "precision": 0,
+                            "min": 0,
+                            "max": 10000000
+                        }
+                    ]
+                }
+                
+            ]
+        },
+        {
+            "label": "Data Augmentation",
+            "label_cn": "数据增强",
+            "info": "Data Augmentation",
+            "info_cn": "数据增强",
+            "id":"data_augmentation",
+            "group_level":1,
+            "children": [
+                
+                {
+                    "type":"groupShow",
+                    "label": "随机缩放",
+                    "label_cn": "随机缩放",
+                    "info": "随机缩放",
+                    "info_cn": "随机缩放",
+                    "id":"shuiji",
+                    "groupChildren":[
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_BASE_SCALE_FACTOR",
+                            "advanced": true,
+                            "label": "base_scale_factor",
+                            "label_cn": "基础缩放因子",
+                            "info": "base_scale_factor",
+                            "info_cn": "训练时, 基础缩放因子",
+                            "value": 1.0,
+                            "precision": 2,
+                            "min": 0,
+                            "max": 1
+                        },
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_SCALE_RANGE",
+                            "advanced": true,
+                            "label": "scale_range",
+                            "label_cn": "随机缩放范围",
+                            "info": "scale_range",
+                            "info_cn": "训练时, 随机缩放范围",
+                            "value": 0.5,
+                            "precision": 2,
+                            "min": 0,
+                            "max": 1
+                        },
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_RANDOM_RESCALE_PROB",
+                            "advanced": true,
+                            "label": "random_rescale_prob",
+                            "label_cn": "执行概率",
+                            "info": "random_rescale_prob",
+                            "info_cn": "训练时, 以一定概率随机缩放样本, 用于数据增强",
+                            "value": 0.5,
+                            "precision": 2,
+                            "min": 0,
+                            "max": 1
+                        }
+                    ]
+                },
+
+                {
+                    "type":"groupShow",
+                    "label": "水平翻转",
+                    "label_cn": "水平翻转",
+                    "info": "水平翻转",
+                    "info_cn": "水平翻转",
+                    "id":"shuiping",
+                    "groupChildren":[
+                        {
+                            "type": "inputNumber",
+                            "key": "VISAION_RANDOM_FLIP_PROB",
+                            "advanced": true,
+                            "label": "random_flip_prob",
+                            "label_cn": "执行概率",
+                            "info": "random_flip_prob",
+                            "info_cn": "训练时, 以一定概率水平翻转样本, 用于数据增强",
+                            "value": 0.5,
+                            "precision": 2,
+                            "min": 0,
+                            "max": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+	"baseParam": {
+
+		"VISAION_TEMPLATE_TYPE": "seg",
+        "VISAION_TEMPLATE_NAME_EN": "visAIon-HYHUNet-RegNetX-400mf-4X",
+        "VISAION_TEMPLATE_NAME_CN": "visAIon-HYHUNet-RegNetX-400mf-4X",
+        "VISAION_TASK_TYPE": "seg",
+        "VISAION_TEMPLATE_NAME": "HYHUNet_RegNetX-400mf-4X_seg.py",
+		"VISAION_CHECKPOINT": "regnetx-400mf_8xb128_in1k_20211213-89bfc226.pth",
+		"VISAION_LOAD_FROM": null,
+		"VISAION_BACKEND": "nccl",
+		"VISAION_NEED_GPUS_LIST": [0],
+        
+		
+		"VISAION_DIR": "/visaion",
+		"VISAION_EXPERIMENT_NAME": "test1",
+		"VISAION_COLOR_TYPE":"color",
+		"VISAION_NEED_GPUS": 1,
+		"VISAION_TRAIN_DATA_ROOT": ["5618.json"],
+        "VISAION_VAL_DATA_ROOT": ["5618.json"],
+        "VISAION_TEST_DATA_ROOT": ["5618.json"],    
+        "VISAION_META_INFO": [
+            {
+                "color":[
+                    0,
+                    215,
+                    255,
+                    255
+                ],
+                "name":"脏污"
+            },
+            {
+                "color":[
+                    255,
+                    215,
+                    0,
+                    255
+                ],
+                "name":"缺陷"
+            }
+        ]        
+
+		
+    }
+}
