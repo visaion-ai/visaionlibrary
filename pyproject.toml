@@ -8,7 +8,7 @@ name = "visaionlibrary"
 dynamic = ["version"]
 description = "A comprehensive deep learning library for computer vision tasks, built on OpenMMLab ecosystem."
 readme = "README.md"
-requires-python = "==3.10"
+requires-python = ">=3.10"
 license = { "text" = "AGPL-3.0" }
 keywords = ["machine-learning", "deep-learning", "computer-vision", "OpenMMLab", "ML", "DL", "AI", "object-detection", "image-segmentation", "instance-segmentation"]
 authors = [

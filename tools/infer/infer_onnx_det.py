@@ -2,8 +2,9 @@ import onnxruntime as ort
 import numpy as np
 import json
 import cv2
+import os
 import argparse
-
+import shutil
 
 def preprocess(image, input_shape):
     # 等比例缩放
@@ -28,6 +29,8 @@ def postprocess(bboxes, image_shape_hw, input_shape_hw, pad_bottom, pad_right, t
     # xyxy转换成xywh
     bboxes_first[:, 2] = bboxes_first[:, 2] - bboxes_first[:, 0]
     bboxes_first[:, 3] = bboxes_first[:, 3] - bboxes_first[:, 1]
+    # 使用threshold过滤
+    bboxes_first = bboxes_first[bboxes_first[:, 4] > threshold]
     # 使用nms对结果进行筛选
     bboxes_first_filter_index = cv2.dnn.NMSBoxes(bboxes_first[:, 0:4], bboxes_first[:, 4], threshold, nms_threshold)
     bboxes_first_filter = bboxes_first[bboxes_first_filter_index]
@@ -80,16 +83,30 @@ def infer_onnx(model_path: str, image_path: str, output_path: str):
     # 后处理
     bboxes, classes, scores = postprocess(result, image.shape[:2], input_shape[2:], pad_bottom, pad_right, threshold=0.5, nms_threshold=0.5)
 
-    # 绘制图片
-    for bbox, class_id, score in zip(bboxes, classes, scores):
-        x1, y1, w, h = bbox
-        x2 = x1 + w
-        y2 = y1 + h
-        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-        cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
-        cv2.putText(image, f"{classes_dict[str(classes[class_id])]} {score:.2f}", (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    if len(bboxes) > 0:
+        # 绘制图片
+        for bbox, class_id, score in zip(bboxes, classes, scores):
+            x1, y1, w, h = bbox
+            x2 = x1 + w
+            y2 = y1 + h
+            x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
+            cv2.putText(image, f"{classes_dict[str(class_id)]} {score:.2f}", (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         
-    cv2.imwrite(output_path, image)
+        # 保存visaion格式的json结果
+        result_json = {"detections": []}
+        for bbox, class_id, score in zip(bboxes, classes, scores):
+            x1, y1, w, h = bbox
+            result_json["detections"].append({
+                "boundingBox": [int(x1), int(y1), int(w), int(h)],
+                "labelName": classes_dict[str(class_id)],
+            })
+        with open(output_path.split(".jpg")[0] + ".json", "w") as f:
+            json.dump(result_json, f)
+            
+        cv2.imwrite(output_path, image)
+    else:
+        shutil.copy(image_path, output_path)
 
 
 
@@ -97,7 +114,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, help='input onnx file path')
     parser.add_argument('--image', type=str, help='input image file path')
+    parser.add_argument('--images', type=str, help='input images file path')
     parser.add_argument('--output', type=str, help='output image file path')
     args = parser.parse_args()
 
-    infer_onnx(args.model, args.image, args.output)
+    if args.image:
+        infer_onnx(args.model, args.image, args.output)
+    elif args.images:
+        os.makedirs(args.output, exist_ok=True)
+        images_path = os.listdir(args.images)
+        for img_p in images_path:
+            print(f"infer image: {img_p}")
+            image_p = os.path.join(args.images, img_p)
+            image_out_p = os.path.join(args.output, img_p)
+            infer_onnx(args.model, image_p, image_out_p)
